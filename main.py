@@ -1,10 +1,10 @@
-import glob, os
+import glob, os, statistics
 import numpy as np
 import pandas as pd
 
 
 # Do we want to do all these things? Yes
-find_area_proportion, find_average, find_region_area, find_sum, write_summary = (True,) * 5
+find_area_proportion, find_average, find_region_area, find_standard_deviation, find_sum, write_summary = (True,) * 6
 
 column = 7 # Column to read from, begins at 0
 skipped_rows = 11 # Number of rows to skip so the reader doesn't get confused, begins at 0
@@ -19,7 +19,7 @@ fileDict = {}
 valueDict = {}
 
 # Create a bunch of empty lists to be used later
-averageList, fileList, proportionList, regionAreaList, sumList = ([] for i in range(5))
+averageList, fileList, proportionList, regionAreaList, sdvList, sumList = ([] for i in range(6))
 
 
 # Generate blank spaces so lists in our dicts don't have mismatched dimensions
@@ -34,6 +34,12 @@ def appendBlank(list, title, val):
 def calcAverage(x):
     avg = fileDict[fileList[x]].mean()
     return avg
+
+
+# Find the standard deviation of the column we're reading from inside one of our files
+def calcStDev(x):
+    sdv = statistics.stdev(fileDict[fileList[x]])
+    return sdv
 
 
 # Find the sum of the column we're reading from inside one of our files
@@ -95,6 +101,12 @@ def generateData(x, length, path):
             newLength -= 3
             proportionList.append(quot)
             dataDict["Area Prop."] = proportionList
+    if find_standard_deviation == True:
+        stdev = calcStDev(x)
+        newList = appendBlank(newList, "St. Dev.", stdev)
+        newLength -= 3
+        sdvList.append(stdev)
+        dataDict["St. Dev."] = sdvList
     for i in range(newLength):
         newList = np.append(newList, "")
     return newList
